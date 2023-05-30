@@ -18,3 +18,7 @@ jobs:
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Project Artifacts to Vercel
         run: echo "url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
+      - uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            Preview Deployment: ${{ steps.Deploy-Preview.outputs.url }}
