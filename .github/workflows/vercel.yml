@@ -21,4 +21,4 @@ jobs:
       - uses: mshick/add-pr-comment@v2
         with:
           message: |
-            Preview Deployment: ${{ steps.Deploy-Preview.outputs.url }}
+            Preview Deployment: $GITHUB_OUTPUT
