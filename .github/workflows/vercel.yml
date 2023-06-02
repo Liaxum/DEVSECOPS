@@ -3,17 +3,18 @@ env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 on:
-  pull_request: 
-    branches: ['main']
-  workflow_run:
-    workflows: ["Run Test","Code scanning results"]
-    branches: [main]
-    types: 
-      - completed
+  pull_request:
+    branches: ["main"]
+
 jobs:
-  
+  snyk-test:
+    uses: ./.github/workflows/snyk-security.yml
+    secrets:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
   Deploy-Preview:
     runs-on: ubuntu-latest
+    needs: [snyk-test]
     steps:
       - uses: actions/checkout@v2
       - name: Install Vercel CLI
@@ -24,18 +25,14 @@ jobs:
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Project Artifacts to Vercel
         id: deploy
-        run: |
-          if [ "${{}}" == "succcess" ]; then
-            echo "url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
-          else
-            exit 1;
-          fi
+        run: echo "url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
       - uses: actions/github-script@v3
-        with: 
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `Preview Deployment: ${{ steps.deploy.outputs.url }}`
-            })
+               issue_number: context.issue.number,
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               body: 'The preview URL is: ${{ steps.deploy.outputs.url }}.'
+             });
