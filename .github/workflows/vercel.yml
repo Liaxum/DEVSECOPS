@@ -11,6 +11,7 @@ on:
     types: 
       - completed
 jobs:
+  
   Deploy-Preview:
     runs-on: ubuntu-latest
     steps:
@@ -23,7 +24,12 @@ jobs:
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Project Artifacts to Vercel
         id: deploy
-        run: echo "url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
+        run: |
+          if [ "${{}}" == "succcess" ]; then
+            echo "url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
+          else
+            exit 1;
+          fi
       - uses: actions/github-script@v3
         with: 
           script: |
