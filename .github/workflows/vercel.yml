@@ -17,6 +17,7 @@ jobs:
       - name: Build Project Artifacts
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Project Artifacts to Vercel
+        id: deploy
         run: echo "url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
       - uses: actions/github-script@v3
         with: 
@@ -25,5 +26,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `Preview Deployment: ${{ steps.Deploy-Preview.outputs.url }}`
+              body: `Preview Deployment: ${{ steps.deploy.outputs.url }}`
             })
